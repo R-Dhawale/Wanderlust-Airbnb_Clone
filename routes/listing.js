@@ -18,7 +18,7 @@ router
 router.get("/new", isLoggedIn, listingsController.renderNewForm);
 
 //Edit Routes 
-router.get("/:id/edit", isLoggedIn, validateListing, isOwner, wrapAsync(listingsController.renderEditForm));
+router.get("/:id/edit", isLoggedIn, isOwner, wrapAsync(listingsController.renderEditForm));
 
 router.route("/:id")
     .get(wrapAsync(listingsController.showListing)) //show & read route
