@@ -21,13 +21,25 @@ module.exports.saveRedirectUrl = (req, res, next) => {
 };
 
 module.exports.isOwner = async (req, res, next) => {
-    let { id } = req.params;
-    let listing = await Listing.findById(id);
-    if (!listing.owner.equals(res.locals.CurrUser._id)) {
-        req.flash("error", "You do not have permission to do that!");
-        return res.redirect(`/listings/${id}`);
+    try {
+        let { id } = req.params;
+        if (!id) {
+            req.flash("error", "Invalid listing id");
+            return res.redirect('/listings');
+        }
+        let listing = await Listing.findById(id);
+        if (!listing) {
+            req.flash("error", "Listing not found");
+            return res.redirect('/listings');
+        }
+        if (!listing.owner || !res.locals.CurrUser || !listing.owner.equals(res.locals.CurrUser._id)) {
+            req.flash("error", "You do not have permission to do that!");
+            return res.redirect(`/listings/${id}`);
+        }
+        next();
+    } catch (err) {
+        next(err);
     }
-    next();
 }
 
 //listing validation middleware
